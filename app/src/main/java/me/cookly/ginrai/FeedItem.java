@@ -6,12 +6,14 @@ package me.cookly.ginrai;
 
 public class FeedItem {
     public String dish;
+    public String imageRef;
 
     public FeedItem() {
 
     }
 
-    public FeedItem(String dish){
+    public FeedItem(String dish, String ref){
         this.dish = dish;
+        this.imageRef = ref;
     }
 }

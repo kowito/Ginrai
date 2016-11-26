@@ -2,21 +2,28 @@ package me.cookly.ginrai;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONObject;
 
@@ -140,15 +147,18 @@ public class LiveFeedFragment extends Fragment {
             extends RecyclerView.Adapter<TripCardRecyclerViewAdapter.ViewHolder> {
 
         private List<DataSnapshot> mValues;
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final TextView mTextView;
+            public final ImageView mImageView;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mTextView = (TextView) view.findViewById(R.id.textViewFeedCardTitle);
+                mImageView = (ImageView) view.findViewById(R.id.imageViewFeedCard);
             }
 
             @Override
@@ -178,6 +188,22 @@ public class LiveFeedFragment extends Fragment {
             final HashMap<String, Object> hash = (HashMap<String, Object>)dataSnapshot.getValue();
             System.out.println(hash.get("dish").toString());
             holder.mTextView.setText(hash.get("dish").toString());
+            StorageReference gsReference = storage.getReferenceFromUrl(hash.get("imageRef").toString());
+
+            final long ONE_MEGABYTE = 1024 * 1024*10;
+            gsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+//                    holder.mImageView;
+                    holder.mImageView.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
+
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
