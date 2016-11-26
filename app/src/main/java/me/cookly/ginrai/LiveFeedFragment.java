@@ -184,7 +184,7 @@ public class LiveFeedFragment extends Fragment {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             final DataSnapshot dataSnapshot = mValues.get(position);
             final HashMap<String, Object> hash = (HashMap<String, Object>)dataSnapshot.getValue();
-            System.out.println(hash.get("dish").toString());
+            System.out.println((double)hash.get("lat"));
             holder.mTextView.setText(hash.get("dish").toString());
             StorageReference gsReference = storage.getReferenceFromUrl(hash.get("imageRef").toString());
 

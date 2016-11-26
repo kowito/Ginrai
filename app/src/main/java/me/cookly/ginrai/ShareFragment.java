@@ -2,13 +2,17 @@ package me.cookly.ginrai;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,7 +102,27 @@ public class ShareFragment extends Fragment {
                         System.out.println(downloadUrl);
 
                         String uuid = UUID.randomUUID().toString();
-                        mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString(), "gs://ginrai-9a3fb.appspot.com/"+filename));
+                        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+//                            ActivityCompat.requestPermissions(new String[]{Manifest.permission
+//                                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
+//                            }, 10);
+                            return;
+                        }
+                        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        double longitude = location.getLongitude();
+                        double latitude = location.getLatitude();
+                        System.out.println(latitude);
+                        System.out.println(longitude);
+                        double time = (double)System.currentTimeMillis();
+                        mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString(), "gs://ginrai-9a3fb.appspot.com/"+filename, latitude, longitude, time));
                     }
                 });
             }
