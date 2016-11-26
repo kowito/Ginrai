@@ -14,6 +14,7 @@ public class NavigationBarActivity extends AppCompatActivity {
 
     private ShareFragment shareFragment = null;
     private LiveFeedFragment liveFeedFragment = null;
+    BottomBar bottomBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,7 @@ public class NavigationBarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_navigation_bar);
 
 
-        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
@@ -29,25 +30,37 @@ public class NavigationBarActivity extends AppCompatActivity {
                     // The tab with id R.id.tab_favorites was selected,
                     // change your content accordingly.
                     System.out.println("share");
-                    if(shareFragment == null) {
-                        shareFragment = new ShareFragment();
-                        System.out.println("New Fragment");
-                    }
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.homepageContentContainer, shareFragment).commit();
+                    startShareFragment();
                 }
                 if (tabId == R.id.tab_live_feed) {
                     // The tab with id R.id.tab_favorites was selected,
                     // change your content accordingly.
                     System.out.println("live feed");
-                    if(liveFeedFragment == null) {
-                        liveFeedFragment = new LiveFeedFragment();
-                        System.out.println("New Fragment");
-                    }
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.homepageContentContainer, liveFeedFragment).commit();
+                    startLiveFeedFragment(false);
                 }
             }
         });
     }
+    public void startShareFragment(){
+        if(shareFragment == null) {
+            shareFragment = new ShareFragment();
+            System.out.println("New Fragment");
+        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.homepageContentContainer, shareFragment).commit();
+    }
+
+    public void startLiveFeedFragment(boolean setPosition){
+        if(setPosition){
+            bottomBar.selectTabAtPosition(1);
+        }
+
+        if(liveFeedFragment == null) {
+            liveFeedFragment = new LiveFeedFragment();
+            System.out.println("New Fragment");
+        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.homepageContentContainer, liveFeedFragment).commit();
+    }
+
 }
