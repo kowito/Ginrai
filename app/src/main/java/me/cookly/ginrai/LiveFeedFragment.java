@@ -1,6 +1,7 @@
 package me.cookly.ginrai;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -145,7 +146,7 @@ public class LiveFeedFragment extends Fragment {
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mTextView = (TextView) view.findViewById(R.id.textViewFeedTitle);
+                mTextView = (TextView) view.findViewById(R.id.textViewFeedCardTitle);
             }
 
             @Override
@@ -184,8 +185,11 @@ public class LiveFeedFragment extends Fragment {
                     //System.out.println(jsonObject.optString("bookingID"));
 
                     Context context = v.getContext();
-                    //Intent intent = new Intent(context, TripDetailsActivity.class);
-                    //intent.putExtra(TripDetailsActivity.jsonStringExtra, jsonObject.toString());
+
+                    Intent intent = new Intent(context, FeedDetailActivity.class);
+                    intent.putExtra(FeedDetailActivity.extra, hash);
+                    context.startActivity(intent);
+
                     //context.startActivity(intent);
                 }
             });
