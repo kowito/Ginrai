@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -69,7 +70,8 @@ public class LiveFeedFragment extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("feed").addChildEventListener(new ChildEventListener() {
+        Query q = mDatabase.child("feed").orderByChild("timeSince").limitToFirst(5);
+        q.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 System.out.println(s);
@@ -77,7 +79,7 @@ public class LiveFeedFragment extends Fragment {
                 if(hasData) {
                     adapter.mValues.add(0, dataSnapshot);
                     rv.getAdapter().notifyDataSetChanged();
-                }else{
+                } else {
                     List<DataSnapshot> list = new ArrayList<DataSnapshot>();
                     list.add(dataSnapshot);
                     adapter = new LiveFeedFragment.TripCardRecyclerViewAdapter(list);
