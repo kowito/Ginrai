@@ -4,9 +4,15 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.json.JSONObject;
+
+import java.util.List;
 
 
 /**
@@ -28,7 +34,9 @@ public class LiveFeedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_live_feed, container, false);
+        View view = inflater.inflate(R.layout.fragment_live_feed, container, false);
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -62,5 +70,65 @@ public class LiveFeedFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public static class TripCardRecyclerViewAdapter
+            extends RecyclerView.Adapter<TripCardRecyclerViewAdapter.ViewHolder> {
+
+        private List<JSONObject> mValues;
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            public final View mView;
+            public final TextView mTextView;
+
+            public ViewHolder(View view) {
+                super(view);
+                mView = view;
+                mTextView = (TextView) view.findViewById(R.id.textViewFeedTitle);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + mTextView.getText();
+            }
+        }
+
+        public JSONObject getValueAt(int position) {
+            return mValues.get(position);
+        }
+
+        public TripCardRecyclerViewAdapter(List<JSONObject> items) {
+            mValues = items;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.feed_card, parent, false);
+            return new LiveFeedFragment.TripCardRecyclerViewAdapter.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            final JSONObject jsonObject = mValues.get(position);
+            holder.mTextView.setText(jsonObject.optString("bookingID"));
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("view clicked");
+                    //System.out.println(jsonObject.optString("bookingID"));
+
+                    Context context = v.getContext();
+                    //Intent intent = new Intent(context, TripDetailsActivity.class);
+                    //intent.putExtra(TripDetailsActivity.jsonStringExtra, jsonObject.toString());
+                    //context.startActivity(intent);
+                }
+            });
+        }
+        @Override
+        public int getItemCount() {
+            return mValues.size();
+        }
     }
 }
