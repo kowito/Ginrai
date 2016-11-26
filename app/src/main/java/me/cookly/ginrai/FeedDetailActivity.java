@@ -19,8 +19,6 @@ public class FeedDetailActivity extends AppCompatActivity {
 
     public static final String extra = "lksd32iuo";
 
-    private int PLACE_PICKER_REQUEST = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,25 +32,8 @@ public class FeedDetailActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-
-                try {
-                    startActivityForResult(builder.build(FeedDetailActivity.this), PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
+                onBackPressed();
             }
         });
-    }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, this);
-                String toastMsg = String.format("Place: %s", place.getName());
-                System.out.println(toastMsg);
-            }
-        }
     }
 }

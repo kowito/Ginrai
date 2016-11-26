@@ -17,6 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -51,6 +56,8 @@ public class ShareFragment extends Fragment {
     public Uri imgUri;
     String mCurrentPhotoPath;
 
+    static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 11234;
+
     public ShareFragment() {
         // Required empty public constructor
     }
@@ -63,6 +70,24 @@ public class ShareFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         View view = inflater.inflate(R.layout.fragment_share, container, false);
+
+        EditText textfieldPlace = (EditText) view.findViewById(R.id.textfieldPlace);
+        textfieldPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Intent intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                    .build(getActivity());
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException e) {
+                    // TODO: Handle the error.
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    // TODO: Handle the error.
+                }
+            }
+        });
+
         previewImage = (ImageView) view.findViewById(R.id.previewImage);
         final EditText textfieldDish = (EditText) view.findViewById(R.id.textfieldDish);
         Button postButton = (Button) view.findViewById(R.id.postButton);
@@ -112,7 +137,6 @@ public class ShareFragment extends Fragment {
         return view;
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -122,6 +146,13 @@ public class ShareFragment extends Fragment {
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 previewImage.setImageBitmap(imageBitmap);
+            }
+        }
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, getActivity());
+                String toastMsg = String.format("Place: %s", place.getName());
+                System.out.println(toastMsg);
             }
         }
     }
