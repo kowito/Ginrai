@@ -1,6 +1,7 @@
 package me.cookly.ginrai;
 
 import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
