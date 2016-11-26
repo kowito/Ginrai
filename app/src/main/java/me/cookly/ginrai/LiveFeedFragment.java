@@ -56,6 +56,8 @@ public class LiveFeedFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_live_feed, container, false);
         System.out.println("feed");
 
+        hasData = false;
+
         final RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerViewFeed);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
 
