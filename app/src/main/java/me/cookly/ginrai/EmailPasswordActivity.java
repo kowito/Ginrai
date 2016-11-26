@@ -1,5 +1,6 @@
 package me.cookly.ginrai;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -51,6 +52,7 @@ public class EmailPasswordActivity extends BaseActivity implements
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+
                 } else {
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
@@ -161,6 +163,8 @@ public class EmailPasswordActivity extends BaseActivity implements
             findViewById(R.id.email_password_buttons).setVisibility(View.GONE);
             findViewById(R.id.email_password_fields).setVisibility(View.GONE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+            Intent intent = new Intent(EmailPasswordActivity.this, NavigationBarActivity.class);
+            startActivity(intent);
         } else {
             mStatusTextView.setText(R.string.signed_out);
             mDetailTextView.setText(null);
