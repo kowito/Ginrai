@@ -12,12 +12,18 @@ import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -32,6 +38,7 @@ public class ShareFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ImageView previewImage;
+    private DatabaseReference mDatabase;
 
     static final int REQUEST_IMAGE_CAPTURE = 111;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -47,34 +54,27 @@ public class ShareFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         View view = inflater.inflate(R.layout.fragment_share, container, false);
 
         previewImage = (ImageView) view.findViewById(R.id.previewImage);
+        final EditText textfieldDish = (EditText) view.findViewById(R.id.textfieldDish);
+        Button postButton = (Button) view.findViewById(R.id.postButton);
+
+        postButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                textfieldDish.getText().toString();
+                String uuid = UUID.randomUUID().toString();
+                mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString()));
+            }
+        });
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
-
-
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
-//        File photoFile = null;
-//        try {
-//            photoFile = createImageFile();
-//        } catch (IOException ex) {
-//            // Error occurred while creating the File
-//        }
-//
-//        // Continue only if the File was successfully created
-//        if (photoFile != null) {
-//            Uri photoURI = FileProvider.getUriForFile(this,
-//                    "com.example.android.fileprovider",
-//                    photoFile);
-//            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-//        }
 
         return view;
     }
@@ -83,45 +83,12 @@ public class ShareFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            previewImage.setImageBitmap(imageBitmap);
-
             if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 previewImage.setImageBitmap(imageBitmap);
-//                encodeBitmapAndSaveToFirebase(imageBitmap);
             }
         }
-    }
-
-
-//    public void encodeBitmapAndSaveToFirebase(Bitmap bitmap) {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-//        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-//        DatabaseReference ref = FirebaseDatabase.getInstance()
-//                .getReference(Constants.FIREBASE_CHILD_RESTAURANTS)
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                .child(mRestaurant.getPushId())
-//                .child("imageUrl");
-//        ref.setValue(imageEncoded);
-//    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg"
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
 
