@@ -1,12 +1,25 @@
 package me.cookly.ginrai;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -18,6 +31,12 @@ import android.view.ViewGroup;
 public class ShareFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private ImageView previewImage;
+
+    static final int REQUEST_IMAGE_CAPTURE = 111;
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    String mCurrentPhotoPath;
 
     public ShareFragment() {
         // Required empty public constructor
@@ -28,8 +47,83 @@ public class ShareFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_share, container, false);
+        View view = inflater.inflate(R.layout.fragment_share, container, false);
+
+        previewImage = (ImageView) view.findViewById(R.id.previewImage);
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+
+
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+//        File photoFile = null;
+//        try {
+//            photoFile = createImageFile();
+//        } catch (IOException ex) {
+//            // Error occurred while creating the File
+//        }
+//
+//        // Continue only if the File was successfully created
+//        if (photoFile != null) {
+//            Uri photoURI = FileProvider.getUriForFile(this,
+//                    "com.example.android.fileprovider",
+//                    photoFile);
+//            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+//            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+//        }
+
+        return view;
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            previewImage.setImageBitmap(imageBitmap);
+
+            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                previewImage.setImageBitmap(imageBitmap);
+//                encodeBitmapAndSaveToFirebase(imageBitmap);
+            }
+        }
+    }
+
+
+//    public void encodeBitmapAndSaveToFirebase(Bitmap bitmap) {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+//        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+//        DatabaseReference ref = FirebaseDatabase.getInstance()
+//                .getReference(Constants.FIREBASE_CHILD_RESTAURANTS)
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                .child(mRestaurant.getPushId())
+//                .child("imageUrl");
+//        ref.setValue(imageEncoded);
+//    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg"
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
