@@ -85,15 +85,17 @@ public class ShareFragment extends Fragment {
         textfieldPlace.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                try {
-                    Intent intent =
-                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(new LatLngBounds(new LatLng(12,100),new LatLng(14,102)))
-                                    .build(getActivity());
-                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    // TODO: Handle the error.
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    // TODO: Handle the error.
+                if(view.getId() == R.id.textfieldPlace && b) {
+                    try {
+                        Intent intent =
+                                new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(new LatLngBounds(new LatLng(12, 100), new LatLng(14, 102)))
+                                        .build(getActivity());
+                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    } catch (GooglePlayServicesRepairableException e) {
+                        // TODO: Handle the error.
+                    } catch (GooglePlayServicesNotAvailableException e) {
+                        // TODO: Handle the error.
+                    }
                 }
             }
         });
@@ -175,7 +177,7 @@ public class ShareFragment extends Fragment {
                                 place.getLatLng().longitude,
                                 time,
                                 place.getName().toString()));
-
+                        ((NavigationBarActivity)getActivity()).startLiveFeedFragment();
                     }
                 });
             }

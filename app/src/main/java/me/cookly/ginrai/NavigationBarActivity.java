@@ -29,25 +29,31 @@ public class NavigationBarActivity extends AppCompatActivity {
                     // The tab with id R.id.tab_favorites was selected,
                     // change your content accordingly.
                     System.out.println("share");
-                    if(shareFragment == null) {
-                        shareFragment = new ShareFragment();
-                        System.out.println("New Fragment");
-                    }
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.homepageContentContainer, shareFragment).commit();
+                    startShareFragment();
                 }
                 if (tabId == R.id.tab_live_feed) {
                     // The tab with id R.id.tab_favorites was selected,
                     // change your content accordingly.
                     System.out.println("live feed");
-                    if(liveFeedFragment == null) {
-                        liveFeedFragment = new LiveFeedFragment();
-                        System.out.println("New Fragment");
-                    }
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.homepageContentContainer, liveFeedFragment).commit();
+                    startLiveFeedFragment();
                 }
             }
         });
+    }
+    public void startShareFragment(){
+        if(shareFragment == null) {
+            shareFragment = new ShareFragment();
+            System.out.println("New Fragment");
+        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.homepageContentContainer, shareFragment).commit();
+    }
+    public void startLiveFeedFragment(){
+        if(liveFeedFragment == null) {
+            liveFeedFragment = new LiveFeedFragment();
+            System.out.println("New Fragment");
+        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.homepageContentContainer, liveFeedFragment).commit();
     }
 }
