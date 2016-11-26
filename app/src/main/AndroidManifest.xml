@@ -20,6 +20,10 @@
         </activity>
 
         <activity android:name=".FeedDetailActivity"></activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBJliiGE4xSNPWSPm4gomhj7moe7jEyM50" />
     </application>
 
     <uses-feature android:name="android.hardware.camera"
