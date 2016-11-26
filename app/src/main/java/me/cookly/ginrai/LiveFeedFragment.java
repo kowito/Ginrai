@@ -4,15 +4,27 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
 
 
 /**
@@ -25,6 +37,12 @@ public class LiveFeedFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    private DatabaseReference mDatabase;
+
+    private LiveFeedFragment.TripCardRecyclerViewAdapter adapter = null;
+
+    private boolean hasData = false;
+
     public LiveFeedFragment() {
         // Required empty public constructor
     }
@@ -35,7 +53,50 @@ public class LiveFeedFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_live_feed, container, false);
+        System.out.println("feed");
 
+        final RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerViewFeed);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("feed").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                System.out.println(s);
+                System.out.println(dataSnapshot);
+                if(hasData) {
+                    adapter.mValues.add(0, dataSnapshot);
+                    rv.getAdapter().notifyDataSetChanged();
+                }else{
+                    List<DataSnapshot> list = new ArrayList<DataSnapshot>();
+                    list.add(dataSnapshot);
+                    adapter = new LiveFeedFragment.TripCardRecyclerViewAdapter(list);
+                    rv.setAdapter(adapter);
+                    rv.getAdapter().notifyDataSetChanged();
+                    hasData = true;
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         return view;
     }
 
@@ -75,7 +136,7 @@ public class LiveFeedFragment extends Fragment {
     public static class TripCardRecyclerViewAdapter
             extends RecyclerView.Adapter<TripCardRecyclerViewAdapter.ViewHolder> {
 
-        private List<JSONObject> mValues;
+        private List<DataSnapshot> mValues;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
@@ -93,11 +154,11 @@ public class LiveFeedFragment extends Fragment {
             }
         }
 
-        public JSONObject getValueAt(int position) {
+        public DataSnapshot getValueAt(int position) {
             return mValues.get(position);
         }
 
-        public TripCardRecyclerViewAdapter(List<JSONObject> items) {
+        public TripCardRecyclerViewAdapter(List<DataSnapshot> items) {
             mValues = items;
         }
 
@@ -110,13 +171,16 @@ public class LiveFeedFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            final JSONObject jsonObject = mValues.get(position);
-            holder.mTextView.setText(jsonObject.optString("bookingID"));
+            final DataSnapshot dataSnapshot = mValues.get(position);
+            final HashMap<String, Object> hash = (HashMap<String, Object>)dataSnapshot.getValue();
+            System.out.println(hash.get("dish").toString());
+            holder.mTextView.setText(hash.get("dish").toString());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     System.out.println("view clicked");
+                    System.out.println(hash.get("dish").toString());
                     //System.out.println(jsonObject.optString("bookingID"));
 
                     Context context = v.getContext();
