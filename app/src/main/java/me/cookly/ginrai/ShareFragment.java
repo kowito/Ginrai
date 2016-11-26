@@ -72,8 +72,8 @@ public class ShareFragment extends Fragment {
             public void onClick(View view) {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReferenceFromUrl("gs://ginrai-9a3fb.appspot.com");
-
-                StorageReference mountainImagesRef = storageRef.child("feed-image/mountains.jpg");
+                final String filename = "feed-image/" + UUID.randomUUID().toString() + ".jpg";
+                StorageReference mountainImagesRef = storageRef.child(filename);
 
 //                previewImage.setDrawingCacheEnabled(true);
 //                previewImage.buildDrawingCache();
@@ -96,11 +96,11 @@ public class ShareFragment extends Fragment {
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
                         System.out.println(downloadUrl);
+
+                        String uuid = UUID.randomUUID().toString();
+                        mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString(), "gs://ginrai-9a3fb.appspot.com/"+filename));
                     }
                 });
-
-                String uuid = UUID.randomUUID().toString();
-                mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString()));
             }
         });
 
