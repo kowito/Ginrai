@@ -166,7 +166,6 @@ public class EmailPasswordActivity extends BaseActivity implements
             Intent intent = new Intent(EmailPasswordActivity.this, NavigationBarActivity.class);
             startActivity(intent);
         } else {
-            mStatusTextView.setText(R.string.signed_out);
             mDetailTextView.setText(null);
 
             findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
