@@ -1,11 +1,14 @@
 package me.cookly.ginrai;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -35,6 +38,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
@@ -54,9 +59,12 @@ public class ShareFragment extends Fragment {
     private DatabaseReference mDatabase;
     static final int REQUEST_IMAGE_CAPTURE = 111;
     public Uri imgUri;
+
+    private Bitmap imgBitmap;
     private Place place = null;
 
     static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 11234;
+    static final int CROP_PIC = 2133;
 
     public ShareFragment() {
         // Required empty public constructor
@@ -119,15 +127,14 @@ public class ShareFragment extends Fragment {
                 final String filename = "feed-image/" + UUID.randomUUID().toString() + ".jpg";
                 StorageReference mountainImagesRef = storageRef.child(filename);
 
-//                previewImage.setDrawingCacheEnabled(true);
-//                previewImage.buildDrawingCache();
-//                Bitmap bitmap = previewImage.getDrawingCache();
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
-//                byte[] data = baos.toByteArray();
+                Bitmap bitmap = imgBitmap;
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
 
-                UploadTask uploadTask = mountainImagesRef.putFile(imgUri);
+
+                UploadTask uploadTask = mountainImagesRef.putBytes(data);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
@@ -188,10 +195,22 @@ public class ShareFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
                 imgUri = data.getData();
-
+                //System.out.println(imgUri.toString());
                 Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                previewImage.setImageBitmap(imageBitmap);
+                Bitmap bitmap = (Bitmap) extras.get("data");
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imgUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int x = (int)Math.min(bitmap.getHeight(),bitmap.getWidth());
+                int offsetY = (bitmap.getHeight() - x) / 2;
+                Matrix matrix = new Matrix();
+                matrix.preRotate(90);
+                bitmap = Bitmap.createBitmap(bitmap, 0, offsetY, x, x, matrix, true);
+                imgBitmap = bitmap;
+
+                previewImage.setImageBitmap(imgBitmap);
             }
         }
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
@@ -205,6 +224,12 @@ public class ShareFragment extends Fragment {
         }
     }
 
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

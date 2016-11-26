@@ -197,7 +197,6 @@ public class LiveFeedFragment extends Fragment {
             gsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] bytes) {
-//                    holder.mImageView;
                     holder.mImageView.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
                 }
             }).addOnFailureListener(new OnFailureListener() {

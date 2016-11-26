@@ -62,4 +62,5 @@ public class NavigationBarActivity extends AppCompatActivity {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.homepageContentContainer, liveFeedFragment).commit();
     }
+
 }
