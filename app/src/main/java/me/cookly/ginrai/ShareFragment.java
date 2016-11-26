@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -54,11 +57,13 @@ public class ShareFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ImageView previewImage;
+    private EditText textfieldPlace;
     private DatabaseReference mDatabase;
     static final int REQUEST_IMAGE_CAPTURE = 111;
     static final int REQUEST_TAKE_PHOTO = 1;
     public Uri imgUri;
     String mCurrentPhotoPath;
+    private Place place = null;
 
     static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 11234;
 
@@ -75,13 +80,30 @@ public class ShareFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_share, container, false);
 
-        EditText textfieldPlace = (EditText) view.findViewById(R.id.textfieldPlace);
+        textfieldPlace = (EditText) view.findViewById(R.id.textfieldPlace);
+        textfieldPlace.setInputType(InputType.TYPE_NULL);
+        textfieldPlace.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                try {
+                    Intent intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(new LatLngBounds(new LatLng(12,100),new LatLng(14,102)))
+                                    .build(getActivity());
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException e) {
+                    // TODO: Handle the error.
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    // TODO: Handle the error.
+                }
+            }
+        });
         textfieldPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("place auto complete");
                 try {
                     Intent intent =
-                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(new LatLngBounds(new LatLng(12,100),new LatLng(14,102)))
                                     .build(getActivity());
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
                 } catch (GooglePlayServicesRepairableException e) {
@@ -147,7 +169,13 @@ public class ShareFragment extends Fragment {
                         System.out.println(latitude);
                         System.out.println(longitude);
                         double time = (double)System.currentTimeMillis();
-                        mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString(), "gs://ginrai-9a3fb.appspot.com/"+filename, latitude, longitude, time));
+                        mDatabase.child("feed").child(uuid).setValue(new FeedItem(textfieldDish.getText().toString(),
+                                "gs://ginrai-9a3fb.appspot.com/"+filename,
+                                place.getLatLng().latitude,
+                                place.getLatLng().longitude,
+                                time,
+                                place.getName().toString()));
+
                     }
                 });
             }
@@ -177,6 +205,8 @@ public class ShareFragment extends Fragment {
                 Place place = PlacePicker.getPlace(data, getActivity());
                 String toastMsg = String.format("Place: %s", place.getName());
                 System.out.println(toastMsg);
+                this.place = place;
+                textfieldPlace.setText(place.getName());
             }
         }
     }

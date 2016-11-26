@@ -10,16 +10,18 @@ public class FeedItem {
     public double lat;
     public double lon;
     public double timeSince;
+    public String placeName;
 
     public FeedItem() {
 
     }
 
-    public FeedItem(String dish, String ref, double lat, double lon, double timeSince){
+    public FeedItem(String dish, String ref, double lat, double lon, double timeSince, String placeName){
         this.dish = dish;
         this.imageRef = ref;
         this.lat = lat;
         this.lon = lon;
         this.timeSince = timeSince;
+        this.placeName = placeName;
     }
 }

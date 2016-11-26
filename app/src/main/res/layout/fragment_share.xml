@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context="me.cookly.ginrai.ShareFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
     <ImageView
         android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_height="240dp"
         app:srcCompat="@android:color/darker_gray"
         android:id="@+id/previewImage" />
 
@@ -20,7 +21,7 @@
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/textfieldDish"
-        android:text="Dish" />
+        android:hint="What is this dish?" />
 
     <EditText
         android:layout_width="match_parent"
@@ -28,13 +29,14 @@
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/textfieldPlace"
-        android:enabled="false"
-        android:hint="Place" />
+        android:editable="false"
+        android:hint="Which restaurant?" />
 
     <Button
-        android:text="Button"
+        android:text="Share this dish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:id="@+id/postButton" />
 
 </LinearLayout>
