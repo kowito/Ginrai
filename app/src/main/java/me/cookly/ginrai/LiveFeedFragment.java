@@ -126,6 +126,7 @@ public class LiveFeedFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        adapter = null;
     }
 
     /**

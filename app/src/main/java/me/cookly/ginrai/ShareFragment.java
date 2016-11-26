@@ -9,11 +9,9 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,11 +35,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
@@ -60,9 +53,7 @@ public class ShareFragment extends Fragment {
     private EditText textfieldPlace;
     private DatabaseReference mDatabase;
     static final int REQUEST_IMAGE_CAPTURE = 111;
-    static final int REQUEST_TAKE_PHOTO = 1;
     public Uri imgUri;
-    String mCurrentPhotoPath;
     private Place place = null;
 
     static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 11234;
@@ -177,7 +168,8 @@ public class ShareFragment extends Fragment {
                                 place.getLatLng().longitude,
                                 time,
                                 place.getName().toString()));
-                        ((NavigationBarActivity)getActivity()).startLiveFeedFragment();
+                        ((NavigationBarActivity)getActivity()).startLiveFeedFragment(true);
+
                     }
                 });
             }
