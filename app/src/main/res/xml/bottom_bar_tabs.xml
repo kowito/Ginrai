@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/tab_share"
+        icon="@drawable/ic_share_black_36dp"
+        title="Share" />
+    <tab
+        id="@+id/tab_live_feed"
+        icon="@drawable/ic_view_day_black_36dp"
+        title="Live Feed" />
+</tabs>
